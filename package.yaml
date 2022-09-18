@@ -23,6 +23,10 @@ dependencies:
 - base >= 4.7 && < 5
 - text
 
+default-extensions:
+  - ImportQualifiedPost
+  - LambdaCase
+
 ghc-options:
 - -Wall
 - -Wcompat
@@ -36,6 +40,8 @@ ghc-options:
 
 library:
   source-dirs: src
+  dependencies:
+  - containers
 
 tests:
   idik-test:
