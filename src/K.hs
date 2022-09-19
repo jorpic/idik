@@ -36,6 +36,8 @@ eval = eval' Map.empty
                 let vars' = Map.insert var val vars
                  in eval' vars' expr
 
+            -- The = verb compares operands for equality, and when applied to
+            -- two vectors it performs an element-wise comparison.
             Op2 Eq x y -> do
                 x' <- ev x
                 y' <- ev y
