@@ -60,6 +60,23 @@ spec = do
 
         (Vec [I 1, I 0, I 1, I 1])
 
+    idiom "573. exclusive or"
+        [text|
+            x:0 0 1 1
+            y:0 1 0 1
+            ~x=y
+        |]
+
+        (Let
+            "x" (Vec [I 0, I 0, I 1, I 1])
+            $ Let
+                "y" (Vec [I 0, I 1, I 0, I 1])
+                    $ Op1 Neg
+                        $ Op2 Eq (Var "x") (Var "y")
+        )
+
+        (Vec [I 0, I 1, I 1, I 0])
+
 idiom :: String -> Text -> K.Expr -> K.Expr -> SpecWith ()
 idiom name prog ast result
     = describe name $ do
