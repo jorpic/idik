@@ -19,13 +19,13 @@ spec = do
         |]
 
         (Let
-            "x" (Arr [I 0, I 0, I 1, I 1])
+            "x" (Vec [I 0, I 0, I 1, I 1])
             $ Let
-                "y" (Arr [I 0, I 1, I 0, I 1])
+                "y" (Vec [I 0, I 1, I 0, I 1])
                     $ Op2 Eq (Var "x") (Var "y")
         )
 
-        (Arr [I 1, I 0, I 0, I 1])
+        (Vec [I 1, I 0, I 0, I 1])
 
     idiom "571. x but not y"
         [text|
@@ -35,13 +35,13 @@ spec = do
         |]
 
         (Let
-            "x" (Arr [I 0, I 1, I 0, I 1])
+            "x" (Vec [I 0, I 1, I 0, I 1])
             $ Let
-                "y" (Arr [I 0, I 0, I 1, I 1])
+                "y" (Vec [I 0, I 0, I 1, I 1])
                     $ Op2 Gt (Var "x") (Var "y")
         )
 
-        (Arr [I 0, I 1, I 0, I 0])
+        (Vec [I 0, I 1, I 0, I 0])
 
 idiom :: String -> Text -> K.Expr -> K.Expr -> SpecWith ()
 idiom name prog ast result

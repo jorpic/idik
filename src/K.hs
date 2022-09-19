@@ -13,7 +13,7 @@ data Op2 = Eq | Gt
 
 data Expr
     = I Integer
-    | Arr [Expr]
+    | Vec [Expr]
     | Let String Expr Expr
     | Op2 Op2 Expr Expr
     | Var String
@@ -30,7 +30,7 @@ eval = eval' Map.empty
         eval' vars = \case
             i@(I _) -> pure i
 
-            Arr xs -> Arr <$> traverse ev xs
+            Vec xs -> Vec <$> traverse ev xs
 
             Let var val expr ->
                 let vars' = Map.insert var val vars
@@ -42,8 +42,8 @@ eval = eval' Map.empty
                 case (x', y') of
                     -- Perform operation element-wise if it is applied to
                     -- vectors.
-                    (Arr a, Arr b)
-                        -> Arr <$> sequence (zipWith (evalOp op) a b)
+                    (Vec a, Vec b)
+                        -> Vec <$> sequence (zipWith (evalOp op) a b)
                     _ -> evalOp op x' y'
 
             Var v -> case Map.lookup v vars of
