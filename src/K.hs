@@ -8,8 +8,8 @@ module K
 import Data.Text (Text)
 import Data.Map qualified as Map
 
-data Op2 = Eq
-    deriving (Eq, Show)
+data Op2 = Eq | Gt
+    deriving (Eq, Ord, Show)
 
 data Expr
     = I Integer
@@ -17,7 +17,7 @@ data Expr
     | Let String Expr Expr
     | Op2 Op2 Expr Expr
     | Var String
-    deriving (Eq, Show)
+    deriving (Eq, Ord, Show)
 
 
 parse :: Text -> Either String Expr
@@ -36,14 +36,15 @@ eval = eval' Map.empty
                 let vars' = Map.insert var val vars
                  in eval' vars' expr
 
-            -- The = verb compares operands for equality, and when applied to
-            -- two vectors it performs an element-wise comparison.
-            Op2 Eq x y -> do
+            Op2 op x y -> do
                 x' <- ev x
                 y' <- ev y
                 case (x', y') of
-                    (Arr a, Arr b) -> Arr <$> sequence (zipWith eval_Eq a b)
-                    _ -> eval_Eq x' y'
+                    -- Perform operation element-wise if it is applied to
+                    -- vectors.
+                    (Arr a, Arr b)
+                        -> Arr <$> sequence (zipWith (evalOp op) a b)
+                    _ -> evalOp op x' y'
 
             Var v -> case Map.lookup v vars of
                 Just x -> ev x
@@ -52,8 +53,8 @@ eval = eval' Map.empty
             where
                 ev = eval' vars
 
-                eval_Eq :: Expr -> Expr -> Either String Expr
-                eval_Eq x y = do
-                    x' <- ev x
-                    y' <- ev y
-                    pure $ I (if x' == y' then 1 else 0)
+evalOp :: Op2 -> Expr -> Expr -> Either String Expr
+evalOp op x y
+    = pure $ case op of
+        Eq -> if x == y then I 1 else I 0
+        Gt -> if x >  y then I 1 else I 0

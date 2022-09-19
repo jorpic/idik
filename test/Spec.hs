@@ -27,6 +27,22 @@ spec = do
 
         (Arr [I 1, I 0, I 0, I 1])
 
+    idiom "571. x but not y"
+        [text|
+            x:0 1 0 1
+            y:0 0 1 1
+            x>y
+        |]
+
+        (Let
+            "x" (Arr [I 0, I 1, I 0, I 1])
+            $ Let
+                "y" (Arr [I 0, I 0, I 1, I 1])
+                    $ Op2 Gt (Var "x") (Var "y")
+        )
+
+        (Arr [I 0, I 1, I 0, I 0])
+
 idiom :: String -> Text -> K.Expr -> K.Expr -> SpecWith ()
 idiom name prog ast result
     = describe name $ do
