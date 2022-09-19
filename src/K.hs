@@ -2,11 +2,15 @@ module K
     ( parse
     , eval
     , Op2(..)
+    , Op1(..)
     , Expr(..)
     ) where
 
 import Data.Text (Text)
 import Data.Map qualified as Map
+
+data Op1 = Neg
+    deriving (Eq, Ord, Show)
 
 data Op2 = Eq | Gt
     deriving (Eq, Ord, Show)
@@ -15,6 +19,7 @@ data Expr
     = I Integer
     | Vec [Expr]
     | Let String Expr Expr
+    | Op1 Op1 Expr
     | Op2 Op2 Expr Expr
     | Var String
     deriving (Eq, Ord, Show)
@@ -36,6 +41,11 @@ eval = eval' Map.empty
                 let vars' = Map.insert var val vars
                  in eval' vars' expr
 
+            Op1 op x
+                -> ev x >>= \case
+                    Vec x' -> Vec <$> traverse (evalOp1 op) x'
+                    x' -> evalOp1 op x'
+
             Op2 op x y -> do
                 x' <- ev x
                 y' <- ev y
@@ -43,8 +53,8 @@ eval = eval' Map.empty
                     -- Perform operation element-wise if it is applied to
                     -- vectors.
                     (Vec a, Vec b)
-                        -> Vec <$> sequence (zipWith (evalOp op) a b)
-                    _ -> evalOp op x' y'
+                        -> Vec <$> sequence (zipWith (evalOp2 op) a b)
+                    _ -> evalOp2 op x' y'
 
             Var v -> case Map.lookup v vars of
                 Just x -> ev x
@@ -53,8 +63,13 @@ eval = eval' Map.empty
             where
                 ev = eval' vars
 
-evalOp :: Op2 -> Expr -> Expr -> Either String Expr
-evalOp op x y
+evalOp1 :: Op1 -> Expr -> Either String Expr
+evalOp1 op x
+    = pure $ case op of
+        Neg -> if x > I 0 then I 0 else I 1
+
+evalOp2 :: Op2 -> Expr -> Expr -> Either String Expr
+evalOp2 op x y
     = pure $ case op of
         Eq -> if x == y then I 1 else I 0
         Gt -> if x >  y then I 1 else I 0
