@@ -19,13 +19,13 @@ spec = do
         |]
 
         (Let
-            "x" (Vec [I 0, I 0, I 1, I 1])
+            "x" (iVec [0, 0, 1, 1])
             $ Let
-                "y" (Vec [I 0, I 1, I 0, I 1])
+                "y" (iVec [0, 1, 0, 1])
                     $ Op2 Eq (Var "x") (Var "y")
         )
 
-        (Vec [I 1, I 0, I 0, I 1])
+        (iVec [1, 0, 0, 1])
 
     idiom "571. x but not y"
         [text|
@@ -35,13 +35,13 @@ spec = do
         |]
 
         (Let
-            "x" (Vec [I 0, I 1, I 0, I 1])
+            "x" (iVec [0, 1, 0, 1])
             $ Let
-                "y" (Vec [I 0, I 0, I 1, I 1])
+                "y" (iVec [0, 0, 1, 1])
                     $ Op2 Gt (Var "x") (Var "y")
         )
 
-        (Vec [I 0, I 1, I 0, I 0])
+        (iVec [0, 1, 0, 0])
 
     idiom "570. x implies y"
         [text|
@@ -51,14 +51,14 @@ spec = do
         |]
 
         (Let
-            "x" (Vec [I 0, I 1, I 0, I 1])
+            "x" (iVec [0, 1, 0, 1])
             $ Let
-                "y" (Vec [I 0, I 0, I 1, I 1])
+                "y" (iVec [0, 0, 1, 1])
                     $ Op1 Neg
                         $ Op2 Gt (Var "x") (Var "y")
         )
 
-        (Vec [I 1, I 0, I 1, I 1])
+        (iVec [1, 0, 1, 1])
 
     idiom "573. exclusive or"
         [text|
@@ -68,14 +68,14 @@ spec = do
         |]
 
         (Let
-            "x" (Vec [I 0, I 0, I 1, I 1])
+            "x" (iVec [0, 0, 1, 1])
             $ Let
-                "y" (Vec [I 0, I 1, I 0, I 1])
+                "y" (iVec [0, 1, 0, 1])
                     $ Op1 Neg
                         $ Op2 Eq (Var "x") (Var "y")
         )
 
-        (Vec [I 0, I 1, I 1, I 0])
+        (iVec [0, 1, 1, 0])
 
     idiom "41.0 indices of ones in Boolean vector x"
         [text|
@@ -84,11 +84,11 @@ spec = do
         |]
 
         (Let
-            "x" (Vec $ map I [0, 0, 1, 0, 1, 0, 0, 0, 1, 0])
+            "x" (iVec [0, 0, 1, 0, 1, 0, 0, 0, 1, 0])
             $ Op1 Where (Var "x")
         )
 
-        (Vec [I 2, I 4, I 8])
+        (iVec [2, 4, 8])
 
     idiom "41.1 generating vector of zeros"
         "&7"
