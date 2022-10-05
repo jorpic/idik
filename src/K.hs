@@ -4,12 +4,13 @@ module K
     , Op2(..)
     , Op1(..)
     , Expr(..)
+    , iVec
     ) where
 
 import Data.Text (Text)
 import Data.Map qualified as Map
 
-data Op1 = Neg
+data Op1 = Neg | Where
     deriving (Eq, Ord, Show)
 
 data Op2 = Eq | Gt
@@ -24,6 +25,8 @@ data Expr
     | Var String
     deriving (Eq, Ord, Show)
 
+iVec :: [Integer] -> Expr
+iVec = Vec . map I
 
 parse :: Text -> Either String Expr
 parse _ = Left "Not implemented"
@@ -41,13 +44,24 @@ eval = eval' Map.empty
                 let vars' = Map.insert var val vars
                  in eval' vars' expr
 
+            -- Some operators
+            Op1 Where x
+                -> ev x >>= \case
+                    Vec xs -> pure
+                        $ Vec $ concat
+                            [ replicate (fromInteger y) (I i)
+                            | (I y,i) <- zip xs [0..]
+                            ]
+                    I i -> pure
+                        $ Vec $ replicate (fromInteger i) (I 0)
+                    _ -> Left $ "Invalid argument type for Where"
             Op1 op x
                 -> ev x >>= \case
                     Vec x' -> Vec <$> traverse (evalOp1 op) x'
                     x' -> evalOp1 op x'
 
             Op2 op x y -> do
-                x' <- ev x
+                x' <- ev x -- FIXME: eval to normal form
                 y' <- ev y
                 case (x', y') of
                     -- Perform operation element-wise if it is applied to

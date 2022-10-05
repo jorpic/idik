@@ -77,6 +77,29 @@ spec = do
 
         (Vec [I 0, I 1, I 1, I 0])
 
+    idiom "41.0 indices of ones in Boolean vector x"
+        [text|
+            x:0 0 1 0 1 0 0 0 1 0
+            &x
+        |]
+
+        (Let
+            "x" (Vec $ map I [0, 0, 1, 0, 1, 0, 0, 0, 1, 0])
+            $ Op1 Where (Var "x")
+        )
+
+        (Vec [I 2, I 4, I 8])
+
+    idiom "41.1 generating vector of zeros"
+        "&7"
+        (Op1 Where (I 7))
+        (iVec $ replicate 7 0)
+
+    idiom "41.2 generating vector of ones"
+        "~&6"
+        (Op1 Neg $ Op1 Where (I 6))
+        (iVec $ replicate 6 1)
+
 idiom :: String -> Text -> K.Expr -> K.Expr -> SpecWith ()
 idiom name prog ast result
     = describe name $ do
